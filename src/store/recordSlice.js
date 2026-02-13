@@ -80,10 +80,35 @@ const recordsSlice = createSlice({
           state.items[index] = { ...state.items[index], ...data };
           localStorage.setItem("employeeRecords", JSON.stringify(state.items));
         }
+    },
+    deleteRecord: (state, action) => {
+        state.items = state.items.filter((r)=> r.id !== action.payload);
+        localStorage.setItem("employeeRecords", JSON.stringify(state.items));
+        state.nextId = calculateNextId(state.items);
+    },
+    setSearchTerm: (state, action) => {
+        state.searchTerm = action.payload;
+    },
+    resetAllRecords: (state, action) => {
+        state.items = demoRecords
+        state.nextId = calculateNextId(demoRecords)
+        localStorage.setItem("employeeRecords", JSON.stringify(demoRecords))
     }
   },
 });
 
-export const {addRecord} = recordsSlice.actions;
+export const {addRecord, updateRecord, deleteRecord, setSearchTerm, resetAllRecords} = recordsSlice.actions;
+
+export const selectAllRecords = (state) => state.records.items
+export const selectSearchTerm = (state) => state.records.searchTerm
+
+export const selsectFilteredRecords = (state) =>{
+    const term = state.records.searchTerm.toLowerCase();
+    return state.records.items.filter((r)=> 
+    r.name.toLowerCase().includes(term) ||
+    r.email.toLowerCase().includes(term) ||
+    r.position.toLowerCase().includes(term)
+);
+};
 
 export default recordsSlice.reducer;
